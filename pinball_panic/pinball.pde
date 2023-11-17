@@ -6,6 +6,9 @@ class Pinball {
   
   float radius, m;
   
+  float BOUNCEFACTOR = 0.5;
+  float FRICTION = 0.995;
+  
   // Contructor
   Pinball(float x, float y, float r) {
     position = new PVector (x, y);
@@ -22,18 +25,39 @@ class Pinball {
   void physics()  {
     position.add(velocity);
     velocity.add(gravity);
+    //velocity.x *= FRICTION;
+    //add object ball check
+    //method cehck static block
+    //
   }
   
   void checkBoundaryCollision()  {
     
       // Bounce off edges
-    if ((position.x > width) || (position.x < 0)) {
+    if ((position.x > width - radius) || (position.x < 0 + radius)) {
       velocity.x = velocity.x * -1;
     }
-    if (position.y > height) {
-      velocity.y = velocity.y * -0.5; // Reducing the velocity when it hits the floor
-      position.y = height;
+    if (position.y > height - radius) {
+      velocity.y = velocity.y * -BOUNCEFACTOR; // Reducing the velocity when it hits the floor
+      position.y = height - radius;
+      friction();
     }
+  }    
+
+
+  
+  void bounce() {
+    velocity.y *= -BOUNCEFACTOR;
+    position.y += velocity.y;
+  }
+  
+  void wallBounce()  {
+    velocity.x *= -BOUNCEFACTOR;
+    position.x += velocity.x;
+  }
+  
+  void friction()  {
+    velocity.x *= FRICTION; 
   }
   
   void checkCollision(Pinball other)  {
