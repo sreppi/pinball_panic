@@ -9,10 +9,7 @@ Kit Barry
 */
 
 // Variables
-Pinball[] ball =  {
-  new Pinball(200, 200, 10),
-  new Pinball(202, 300, 10)
-};
+ArrayList<Pinball> ball;
 
 StaticBlocks[] block =  {
   new StaticBlocks(200, 500, 50, 50),
@@ -22,6 +19,7 @@ StaticBlocks[] block =  {
 void setup()  {
   size (400, 600);
   frameRate(60);
+  ball = new ArrayList<Pinball>();
 }
 
 void draw()  {
@@ -52,11 +50,18 @@ void draw()  {
         
     b.checkBoundaryCollision();
   }
+  for (int i = ball.size() -1 ; i >= 0; i--){
+    ball.get(i);
+  }
   
   ball[0].checkCollision(ball[1]);
   
   for (StaticBlocks b: block)  {
     b.display();
+  }
+  
+  if(mousePressed == true)  {
+    ball.add(new Pinball(200, 200, 10));
   }
   
 }
