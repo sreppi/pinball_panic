@@ -1,22 +1,24 @@
 /*
 
-Student:
-Calvin Ip
-
-Professor: 
-Kit Barry
-
-*/
+ Student:
+ Calvin Ip
+ 
+ Professor:
+ Kit Barry
+ 
+ */
 
 // Variables
 ArrayList<Pinball> ball;
+float spawnTimer = 0;
 
 StaticBlocks[] block =  {
   new StaticBlocks(200, 500, 50, 50),
-  new StaticBlocks(300, 600, 50, 50)
+  new StaticBlocks(300, 600, 50, 50),
+  new StaticBlocks(100, 600, 50, 50)
 };
 
-void setup()  {
+void setup() {
   size (400, 600);
   frameRate(60);
   ball = new ArrayList<Pinball>();
@@ -26,9 +28,18 @@ void draw()  {
   background(#768ca4);
   rectMode(CENTER);
   
+  // Check collisions between balls
+  for (int i = 0; i < ball.size(); i++) {
+    for (int j = i + 1; j < ball.size(); j++) {
+      ball.get(i).checkCollision(ball.get(j));
+    }
+  }
+
   for (Pinball b : ball)  {
     b.display();
     b.physics();
+    b.checkBoundaryCollision();
+    
     for (StaticBlocks c: block) {
       if((b.position.y - b.radius) < (c.position.y + c.size.y / 2) && (b.position.y + b.radius) > (c.position.y - c.size.y / 2)) {
         if((b.position.x - b.radius) < (c.position.x + c.size.x / 2) && (b.position.x + b.radius) > (c.position.x - c.size.x / 2)) {
@@ -37,31 +48,31 @@ void draw()  {
         }
       }
       if((b.position.x - b.radius) < (c.position.x + c.size.x / 2) && (b.position.x + b.radius) > (c.position.x - c.size.x / 2)) {
-        if((b.position.y - b.radius) < (c.position.y + (c.size.y - 6) / 2) && (b.position.y + b.radius) > (c.position.y - (c.size.y - 6) / 2)) { // Subtracting 6 from the size is to prevent some weird clipping error.
+        if((b.position.y - b.radius) < (c.position.y + (c.size.y - 6) / 2) && (b.position.y + b.radius) > (c.position.y - (c.size.y - 6) / 2)) {
           b.wallBounce();
         }
       }
-
     }
-    
-    //bisector for slopes to rotate
-    //intersection for a line
-    //balls as a point rather than a circle
-        
-    b.checkBoundaryCollision();
   }
-  for (int i = ball.size() -1 ; i >= 0; i--){
-    ball.get(i);
-  }
-  
-  ball[0].checkCollision(ball[1]);
   
   for (StaticBlocks b: block)  {
     b.display();
   }
   
-  if(mousePressed == true)  {
-    ball.add(new Pinball(200, 200, 10));
+  if(mousePressed && spawnTimer == 0)  {
+    spawnTimer = 1;
+    Pinball newBall = new Pinball(random(198,202), 200, 10);
+    // Check collisions between the new ball and existing balls
+    for (Pinball existingBall : ball) {
+      existingBall.checkCollision(newBall);
+    }
+    ball.add(newBall);
   }
   
+  if (spawnTimer >= 1 && spawnTimer < 60)  {
+    spawnTimer += 1;
+  }
+  if (spawnTimer >= 60)  {
+    spawnTimer = 0;
+  }
 }

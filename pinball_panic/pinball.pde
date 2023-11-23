@@ -1,39 +1,35 @@
 class Pinball {
   // Variables
-  PVector position = new PVector(200,200);
+  PVector position = new PVector(200, 200);
   PVector velocity = new PVector(0, 2.1);
   PVector gravity = new PVector(0, 0.2);
-  
+
   float radius, m;
-  
+
   float BOUNCEFACTOR = 0.5;
   float FRICTION = 0.995;
-  
+
   // Contructor
   Pinball(float x, float y, float r) {
     position = new PVector (x, y);
     radius = r;
     m = radius * 1;
   }
-  
-  void display()  {
+
+  void display() {
     noStroke();
     fill(#D7D7DE);
     ellipse(position.x, position.y, radius * 2, radius * 2);
   }
-  
-  void physics()  {
+
+  void physics() {
     position.add(velocity);
     velocity.add(gravity);
-    //velocity.x *= FRICTION;
-    //add object ball check
-    //method cehck static block
-    //
   }
-  
-  void checkBoundaryCollision()  {
-    
-      // Bounce off edges
+
+  void checkBoundaryCollision() {
+
+    // Bounce off edges
     if ((position.x > width - radius) || (position.x < 0 + radius)) {
       velocity.x = velocity.x * -1;
     }
@@ -42,40 +38,41 @@ class Pinball {
       position.y = height - radius;
       friction();
     }
-  }    
+  }
 
 
-  
+
   void bounce() {
     velocity.y *= -BOUNCEFACTOR;
     position.y += velocity.y;
   }
-  
-  void wallBounce()  {
+
+  void wallBounce() {
     velocity.x *= -BOUNCEFACTOR;
     position.x += velocity.x;
   }
-  
-  void friction()  {
-    velocity.x *= FRICTION; 
+
+  void friction() {
+    velocity.x *= FRICTION;
   }
-  
-  void checkCollision(Pinball other)  {
-    // Get distances between the balls components
-    PVector distanceVect = PVector.sub(other.position, position);
 
-    // Calculate magnitude of the vector separating the balls
-    float distanceVectMag = distanceVect.mag();
+void checkCollision(Pinball other) {
+  // Get distances between the balls components
+  PVector distanceVect = PVector.sub(other.position, position);
 
-    // Minimum distance before they are touching
-    float minDistance = radius + other.radius;
+  // Calculate magnitude of the vector separating the balls
+  float distanceVectMag = distanceVect.mag();
 
-    if (distanceVectMag < minDistance) {
-      float distanceCorrection = (minDistance-distanceVectMag)/2.0;
-      PVector d = distanceVect.copy();
-      PVector correctionVector = d.normalize().mult(distanceCorrection);
-      other.position.add(correctionVector);
-      position.sub(correctionVector);
+  // Minimum distance before they are touching
+  float minDistance = radius + other.radius;
+
+  // Only check collision if the balls have moved a certain distance
+  if (distanceVectMag < minDistance && distanceVectMag > 0.1) {
+    float distanceCorrection = (minDistance - distanceVectMag) / 2.0;
+    PVector d = distanceVect.copy();
+    PVector correctionVector = d.normalize().mult(distanceCorrection);
+    other.position.add(correctionVector);
+    position.sub(correctionVector);
 
       // get angle of distanceVect
       float theta  = distanceVect.heading();
@@ -83,14 +80,14 @@ class Pinball {
       float sine = sin(theta);
       float cosine = cos(theta);
 
-      /* bTemp will hold rotated ball positions. You 
+      /* bTemp will hold rotated ball positions. You
        just need to worry about bTemp[1] position*/
       PVector[] bTemp = {
         new PVector(), new PVector()
       };
 
       /* this ball's position is relative to the other
-       so you can use the vector between them (bVect) as the 
+       so you can use the vector between them (bVect) as the
        reference point in the rotation expressions.
        bTemp[0].position.x and bTemp[0].position.y will initialize
        automatically to 0.0, which is what you want
@@ -109,9 +106,9 @@ class Pinball {
       vTemp[1].y  = cosine * other.velocity.y - sine * other.velocity.x;
 
       /* Now that velocities are rotated, you can use 1D
-       conservation of momentum equations to calculate 
+       conservation of momentum equations to calculate
        the final velocity along the x-axis. */
-      PVector[] vFinal = {  
+      PVector[] vFinal = {
         new PVector(), new PVector()
       };
 
@@ -128,10 +125,10 @@ class Pinball {
       bTemp[1].x += vFinal[1].x;
 
       /* Rotate ball positions and velocities back
-       Reverse signs in trig expressions to rotate 
+       Reverse signs in trig expressions to rotate
        in the opposite direction */
       // rotate balls
-      PVector[] bFinal = { 
+      PVector[] bFinal = {
         new PVector(), new PVector()
       };
 
@@ -153,5 +150,4 @@ class Pinball {
       other.velocity.y = cosine * vFinal[1].y + sine * vFinal[1].x;
     }
   }
-  
 }
